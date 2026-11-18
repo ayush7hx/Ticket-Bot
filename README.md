@@ -146,6 +146,24 @@ python main.py
 
 ---
 
+### Option C - Render Web Service
+
+The bot also serves a small health endpoint so it can run as a Render Web
+Service alongside its Discord connection.
+
+1. Create a **Web Service** from this repository and select the `main` branch.
+2. Set the build command to `pip install -r requirements.txt`.
+3. Set the start command to `python main.py`.
+4. Add `TOKEN` under **Environment Variables** in Render. Do not commit the bot token.
+5. Set the health check path to `/health`.
+
+Render provides the `PORT` environment variable automatically. The `/` and
+`/health` routes return JSON with the bot's Discord connection status. Free
+Web Services can spin down after 15 minutes without inbound traffic; use an
+always-on paid instance if the bot must stay connected continuously.
+
+---
+
 ### Discord Developer Portal Setup
 
 1. Go to https://discord.com/developers/applications

@@ -9,6 +9,7 @@
 import os
 import asyncio
 import discord
+from aiohttp import web
 from discord.ext import commands
 from dotenv import load_dotenv
 from utils.emojis import sync_application_emojis
@@ -48,6 +49,19 @@ bot = TicketBot(
 )
 
 
+async def health(request: web.Request) -> web.Response:
+    return web.json_response(
+        {"status": "ok", "discord_connected": bot.is_ready()}
+    )
+
+
+def create_web_app() -> web.Application:
+    app = web.Application()
+    app.router.add_get("/", health)
+    app.router.add_get("/health", health)
+    return app
+
+
 @bot.event
 async def on_ready():
     print("=" * 52)
@@ -74,8 +88,17 @@ async def on_ready():
 
 
 async def main():
-    async with bot:
-        await bot.start(TOKEN)
+    port = int(os.getenv("PORT", "10000"))
+    runner = web.AppRunner(create_web_app())
+    await runner.setup()
+    site = web.TCPSite(runner, "0.0.0.0", port)
+    await site.start()
+    print(f"  Health server listening on port {port}")
+    try:
+        async with bot:
+            await bot.start(TOKEN)
+    finally:
+        await runner.cleanup()
 
 
 if __name__ == "__main__":
