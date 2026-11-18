@@ -35,10 +35,20 @@ def get_config(guild_id: int) -> dict | None:
     return _load_configs().get(str(guild_id))
 
 
+def get_all_configs() -> dict:
+    return _load_configs()
+
+
 def set_config(guild_id: int, config: dict):
     all_c = _load_configs()
     all_c[str(guild_id)] = config
     _save_configs(all_c)
+
+
+def add_panel_record(guild_id: int, panel: dict):
+    config = get_config(guild_id) or {}
+    config.setdefault("panels", []).append(panel)
+    set_config(guild_id, config)
 
 
 # ── Ticket Records ─────────────────────────────────────────────

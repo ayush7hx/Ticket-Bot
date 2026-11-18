@@ -3,7 +3,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from utils.emojis import get_emoji
-from utils.store import get_config, set_config
+from utils.store import add_panel_record, get_config, set_config
 
 # ── Custom Emojis ──────────────────────────────────────────────
 E_SUCCESS  = get_emoji("success")
@@ -921,10 +921,12 @@ class PreviewLayout(discord.ui.LayoutView):
             "panel_button_emoji": s.panel_button_emoji,
             "panel_button_color": s.panel_button_color,
             "form_steps":         existing.get("form_steps", {}),
+            "panels":             existing.get("panels", []),
         }
         set_config(interaction.guild.id, config)
 
         try:
+            panel_type = "dropdown" if self.dropdown else "button"
             if self.dropdown:
                 from cogs.tickets import TicketSelectPanel, build_panel_layout
 
@@ -979,7 +981,14 @@ class PreviewLayout(discord.ui.LayoutView):
             if panel_ch is None:
                 panel_ch = await interaction.guild.fetch_channel(s.panel_channel.id)
 
-            await panel_ch.send(view=panel_view)
+            message = await panel_ch.send(view=panel_view)
+            add_panel_record(interaction.guild.id, {
+                "message_id": str(message.id),
+                "channel_id": str(panel_ch.id),
+                "type": panel_type,
+                "categories": s.active_categories[:],
+                "show_main_button": s.show_main_button,
+            })
 
             if self.dropdown:
                 done_text = (

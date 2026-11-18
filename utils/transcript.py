@@ -81,6 +81,6 @@ def _build_html(channel: discord.TextChannel, messages: list[discord.Message]) -
   <p>Generated on {generated} &nbsp;•&nbsp; <span class="brand">Ticket Bot</span> &nbsp;•&nbsp; customized by Ayush7hx</p>
 </header>
 {rows}
-<footer>Ticket Bot • Customized by Ayush7hx • Original project by wmikon • {generated}</footer>
+<footer>Ticket Bot • Ayush7hx • {generated}</footer>
 </body>
 </html>"""

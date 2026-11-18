@@ -6,7 +6,7 @@ from discord import app_commands
 from discord.ext import commands
 
 from utils.store import (
-    get_config, set_config, get_ticket, get_user_open_count,
+    get_config, get_all_configs, add_panel_record, set_config, get_ticket, get_user_open_count,
     next_ticket_number, create_ticket, update_ticket, delete_ticket,
 )
 from utils.transcript import generate_transcript
@@ -83,6 +83,19 @@ def ticket_num(n: int) -> str:
 
 def _style(color: str) -> discord.ButtonStyle:
     return BUTTON_COLOR_MAP.get(color, discord.ButtonStyle.primary)
+
+
+def _legacy_panel_category(config: dict, custom_id: str, fallback: str) -> str:
+    categories = config.get("active_categories", DEFAULT_CATEGORIES[:])
+    if custom_id == "panel:open":
+        return categories[0] if categories else "General Support"
+    return next(
+        (
+            category for category in categories
+            if f"panel:{category.lower().replace(' ', '_')[:80]}" == custom_id
+        ),
+        fallback,
+    )
 
 
 class MessageLayout(discord.ui.LayoutView):
@@ -725,10 +738,12 @@ class TicketPanelView(discord.ui.View):
         button_colors: dict | None = None,
         active_categories: list[str] | None = None,
         show_main_button: bool = True,
+        resolve_categories_from_config: bool = False,
     ):
         super().__init__(timeout=None)
         if active_categories is None:
             active_categories = DEFAULT_CATEGORIES[:]
+        self.resolve_categories_from_config = resolve_categories_from_config
 
         # Resolve colour for a given key
         def _color(key: str, fallback: str) -> discord.ButtonStyle:
@@ -788,7 +803,12 @@ class TicketPanelView(discord.ui.View):
 
     def _cb(self, category: str):
         async def callback(interaction: discord.Interaction):
-            await start_form(interaction, category)
+            selected_category = category
+            if self.resolve_categories_from_config:
+                config = get_config(interaction.guild.id) or {}
+                custom_id = interaction.data.get("custom_id", "")
+                selected_category = _legacy_panel_category(config, custom_id, category)
+            await start_form(interaction, selected_category)
         return callback
 
 
@@ -922,7 +942,7 @@ HELP_PAGES = {
             f"> Per-user ticket limits\n"
             f"> Persistent buttons across bot restarts\n"
             f"> No database required\n\n"
-            f"Customized by **Ayush7hx**, based on the original project by **wmikon**.\n\n"
+            f"Developed and maintained by **Ayush7hx**.\n\n"
             f"Support server: https://discord.gg/darkinfinite"
         ),
     },
@@ -1084,19 +1104,50 @@ async def _setform_autocomplete(
 
 # ── Cog ───────────────────────────────────────────────────────
 
+def _register_persistent_views(bot: commands.Bot):
+    # Keep global registrations for panels created before message IDs were saved.
+    bot.add_view(TicketPanelView(resolve_categories_from_config=True))
+    bot.add_view(TicketSelectPanel())
+    bot.add_view(TicketControlView())
+    bot.add_view(ClosedTicketView())
+    bot.add_view(HelpView())
+    bot.add_view(PanelExtraButtonRegistration())
+
+    for config in get_all_configs().values():
+        categories = config.get("active_categories", DEFAULT_CATEGORIES[:])
+        bot.add_view(TicketPanelView(
+            active_categories=categories,
+            show_main_button=config.get("show_main_button", True),
+            resolve_categories_from_config=True,
+        ))
+        for panel in config.get("panels", []):
+            try:
+                message_id = int(panel["message_id"])
+                panel_type = panel["type"]
+                categories = panel.get("categories", DEFAULT_CATEGORIES[:])
+                if panel_type == "button":
+                    view = TicketPanelView(
+                        active_categories=categories,
+                        show_main_button=panel.get("show_main_button", True),
+                    )
+                elif panel_type == "dropdown":
+                    view = TicketSelectPanel(active_categories=categories)
+                else:
+                    print(f"  Skipped panel {message_id}: unknown panel type {panel_type!r}")
+                    continue
+            except (KeyError, TypeError, ValueError) as error:
+                print(f"  Skipped invalid saved ticket panel: {error}")
+                continue
+
+            bot.add_view(view, message_id=message_id)
+
+
 class TicketsCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        # Restore persistent views — must match the custom_ids used when panels were sent
-        self.bot.add_view(TicketPanelView())
-        self.bot.add_view(TicketSelectPanel())
-        self.bot.add_view(TicketControlView())
-        self.bot.add_view(ClosedTicketView())
-        self.bot.add_view(HelpView())
-        self.bot.add_view(PanelExtraButtonRegistration())
+    async def cog_load(self):
+        _register_persistent_views(self.bot)
 
     @app_commands.command(name="help", description="View Ticket Bot help and commands")
     async def help_cmd(self, interaction: discord.Interaction):
@@ -1156,7 +1207,13 @@ class TicketsCog(commands.Cog):
         if not panel_ch:
             panel_ch = await interaction.guild.fetch_channel(int(config["panel_channel_id"]))
 
-        await panel_ch.send(view=panel_view)
+        message = await panel_ch.send(view=panel_view)
+        add_panel_record(interaction.guild.id, {
+            "message_id": str(message.id),
+            "channel_id": str(panel_ch.id),
+            "type": "dropdown",
+            "categories": cats,
+        })
         await interaction.response.send_message(
             view=_ok(f"Dropdown panel sent to {panel_ch.mention}!"), ephemeral=True
         )

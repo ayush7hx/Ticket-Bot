@@ -1,7 +1,7 @@
 """
 ╔══════════════════════════════════════════════════╗
 ║          Ticket Bot                              ║
-║          Fork customized by Ayush7hx             ║
+║          Maintained by Ayush7hx                   ║
 ║          discord.py 2.7+ • Python 3.10+          ║
 ╚══════════════════════════════════════════════════╝
 """
@@ -75,8 +75,7 @@ async def on_ready():
     print(f"  Bot      : {bot.user}")
     print(f"  ID       : {bot.user.id}")
     print(f"  Servers  : {len(bot.guilds)}")
-    print(f"  Customized: Ayush7hx")
-    print(f"  Original  : wmikon")
+    print(f"  Maintainer: Ayush7hx")
     print(f"  Brand     : Ticket Bot")
     print("=" * 52)
     try:

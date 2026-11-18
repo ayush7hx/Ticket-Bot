@@ -1,6 +1,6 @@
 # Ticket Bot
 
-> **Fork customized and maintained by Ayush7hx.** Original project by wmikon - Discord ID: `1313132336799420468`
+> **Developed and maintained by Ayush7hx.** See [LICENSE](./LICENSE) for upstream copyright and attribution.
 > Support server: [discord.gg/darkinfinite](https://discord.gg/darkinfinite)
 
 A fully-featured Discord ticket bot built with **discord.py 2.7+** and **Python 3.10+**.  
@@ -212,7 +212,7 @@ Once the bot is online:
 - Per-user ticket limit enforcement
 - HTML transcripts DMed to users on ticket deletion
 - Full log channel support (opened, claimed, closed, reopened, deleted)
-- Persistent buttons - survive bot restarts
+- Persistent panels and ticket buttons - survive bot restarts, including custom category buttons
 - No database required - lightweight JSON file storage
 
 ---
@@ -228,9 +228,9 @@ Once the bot is online:
 **Intents error on startup?**  
 -> Enable Server Members Intent and Message Content Intent in the Discord Developer Portal.
 
-**Buttons stop working after restart?**  
--> This bot uses persistent views  they should survive restarts. If not, ensure `main.py` is fully restarted.
+**Panels stop working after restart?**
+-> Panel message IDs and category settings are saved so their buttons can be restored on startup. Older panels use the active categories saved in the bot config. Keep the bot's `data/configs.json` file across redeploys; if your host uses an ephemeral filesystem, configure a persistent disk for the `data` directory.
 
 ---
 
-*Ticket Bot fork customized by Ayush7hx. Original project by wmikon (Discord ID: `1313132336799420468`).*
+*Ticket Bot by Ayush7hx. See [LICENSE](./LICENSE) for upstream attribution.*
