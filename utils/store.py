@@ -1,6 +1,5 @@
 """
-Storage utility — Linuxx Ticketing
-Dev: wmikon
+Ticket Bot storage utility
 """
 import json
 import time

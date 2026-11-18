@@ -1,1 +1,1 @@
-# cogs package — Linuxx Ticketing • dev: wmikon
+# Ticket Bot cogs

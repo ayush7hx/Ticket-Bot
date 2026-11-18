@@ -10,21 +10,22 @@ from utils.store import (
     next_ticket_number, create_ticket, update_ticket, delete_ticket,
 )
 from utils.transcript import generate_transcript
+from utils.emojis import get_emoji
 
 # ── Custom Emojis (all IDs from source) ───────────────────────
-E_SUCCESS  = "<:success:1518137986095644703>"   # tick
-E_CROSS    = "<:wickk:1518137821355966494>"     # cross
-E_INFO     = "<:Warning:1517892973482868960>"   # info
-E_WARN     = "<:warn:1518063335923257386>"      # warn
-E_TICKET   = "<:ticket:1513730006910500977>"    # ticket
-E_BUG      = "<:TbotBug:1518063885855358996>"   # bug
-E_CLAIM    = "<:claim:1518064508948447242>"     # claim
-E_VIEW     = "<:view:1518064705854373969>"      # view/configure
-E_REOPEN   = "<:ticket_reopen:1518064251405733898>"  # reopen
-E_QUESTION = "<:question_mark:1518064034862076007>"  # question
-E_DELETE   = "<:delete:1518064106723217418>"    # delete/trash
-E_SETUP    = "<:setup:1518064880769568828>"     # setup/gear
-E_CUSTOM   = "<:customize:1518065679041957989>" # customise/pencil
+E_SUCCESS  = get_emoji("success")
+E_CROSS    = get_emoji("cross")
+E_INFO     = get_emoji("info")
+E_WARN     = get_emoji("warn")
+E_TICKET   = get_emoji("ticket")
+E_BUG      = get_emoji("bug")
+E_CLAIM    = get_emoji("claim")
+E_VIEW     = get_emoji("view")
+E_REOPEN   = get_emoji("reopen")
+E_QUESTION = get_emoji("question")
+E_DELETE   = get_emoji("delete")
+E_SETUP    = get_emoji("setup")
+E_CUSTOM   = get_emoji("customize")
 
 # ── Colors ─────────────────────────────────────────────────────
 # All container accent bars + backgrounds are pure black, regardless of
@@ -71,8 +72,8 @@ CATEGORY_DESCRIPTIONS = {
     "Other":           "Something not listed above",
 }
 
-BRAND      = "Linuxx Ticketing"
-BRAND_FULL = "Linuxx Ticketing • Powered by wmikon"
+BRAND      = "Ticket Bot"
+BRAND_FULL = "Ticket Bot • Customized by Ayush7hx"
 
 
 # ── Helpers ────────────────────────────────────────────────────
@@ -509,7 +510,7 @@ class ClosedTicketView(discord.ui.View):
                         ),
                         inline=False,
                     )
-                    dm_msg.set_footer("Linuxx Ticketing • Powered by wmikon")
+                    dm_msg.set_footer("Ticket Bot • Customized by Ayush7hx")
                     await author.send(**dm_msg.to_send_kwargs())
                     await author.send(file=t2)
                 except Exception:
@@ -825,9 +826,9 @@ class TicketSelectPanel(discord.ui.View):
 
 HELP_PAGES = {
     "root": {
-        "title": f"{E_INFO} Linuxx Ticketing — Help",
+        "title": f"{E_INFO} Ticket Bot — Help",
         "body": (
-            f"Welcome to **Linuxx Ticketing**!\n"
+            f"Welcome to **Ticket Bot**!\n"
             f"Select a topic from the menu below.\n\n"
             f"> {E_TICKET} **Getting Started** — how to open tickets\n"
             f"> {E_CLAIM} **Staff Commands** — manage tickets\n"
@@ -904,14 +905,14 @@ HELP_PAGES = {
             f"> Users select from a dropdown menu\n"
             f"> Shows category name, description & emoji\n"
             f"> Supports up to 10 categories\n"
-            f"> Displays the animated ticket banner GIF\n\n"
+            f"> Supports an optional custom banner image\n\n"
             f"Both panels support multi-step forms."
         ),
     },
     "about": {
-        "title": f"{E_INFO} About Linuxx Ticketing",
+        "title": f"{E_INFO} About Ticket Bot",
         "body": (
-            f"**Linuxx Ticketing** is a fully-featured Discord ticket system.\n\n"
+            f"**Ticket Bot** is a fully-featured Discord ticket system.\n\n"
             f"**Features**\n"
             f"> Two panel styles — buttons & dropdown\n"
             f"> Multi-step customisable ticket forms\n"
@@ -921,7 +922,8 @@ HELP_PAGES = {
             f"> Per-user ticket limits\n"
             f"> Persistent buttons across bot restarts\n"
             f"> No database required\n\n"
-            f"**Powered by wmikon**"
+            f"Customized by **Ayush7hx**, based on the original project by **wmikon**.\n\n"
+            f"Support server: https://discord.gg/darkinfinite"
         ),
     },
 }
@@ -1096,7 +1098,7 @@ class TicketsCog(commands.Cog):
         self.bot.add_view(HelpView())
         self.bot.add_view(PanelExtraButtonRegistration())
 
-    @app_commands.command(name="help", description="View Linuxx Ticketing help and commands")
+    @app_commands.command(name="help", description="View Ticket Bot help and commands")
     async def help_cmd(self, interaction: discord.Interaction):
         await interaction.response.send_message(view=HelpView(page_key="root"), ephemeral=True)
 

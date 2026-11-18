@@ -1,6 +1,7 @@
-# Linuxx Tickets
+# Ticket Bot
 
-> **Developed by wmikon** - Discord ID: `1313132336799420468`
+> **Fork customized and maintained by Ayush7hx.** Original project by wmikon - Discord ID: `1313132336799420468`
+> Support server: [discord.gg/darkinfinite](https://discord.gg/darkinfinite)
 
 A fully-featured Discord ticket bot built with **discord.py 2.7+** and **Python 3.10+**.  
 All panels, ticket messages, and replies use Discord's **Components V2** (`LayoutView` / `Container`) - no legacy embeds.
@@ -10,21 +11,29 @@ All panels, ticket messages, and replies use Discord's **Components V2** (`Layou
 ## Project Structure
 
 ```
-Linuxx Tickets/
+Ticket-Bot/
  main.py                  Bot entry point
  requirements.txt         Python dependencies
- .env                     Your bot token (never share this!)
+ .env.example             Token configuration template
  LICENSE                  Project licence
  cogs/
     setup.py             /setup command & wizard
     tickets.py           Ticket logic, panels, buttons
  utils/
+     emojis.py            Application emoji synchronization
     store.py             JSON config & ticket storage
     transcript.py        HTML transcript generator
+  tests/                   Startup emoji sync tests
  data/                    Auto-created on first run
      configs.json
      tickets.json
 ```
+
+The bot syncs its built-in custom emojis to its Discord application at startup.
+These application emojis work in every server where the bot is installed, so
+the bot does not need to join a separate emoji server. The first startup needs
+internet access to fetch the emoji images and a valid bot token for the
+application; subsequent starts reuse the application emojis.
 
 ---
 
@@ -55,10 +64,10 @@ sudo apt update && sudo apt install python3 python3-pip python3-venv -y
 ```
 
 **3. Upload the bot files**  
-Using SCP, SFTP (FileZilla), or git clone your repository:
+Using SCP, SFTP (FileZilla), or git clone:
 ```bash
-git clone https://github.com/youruser/linuxx-tickets.git
-cd linuxx-tickets
+git clone https://github.com/ayush7hx/Ticket-Bot.git
+cd Ticket-Bot
 ```
 
 **4. Create a virtual environment**
@@ -73,7 +82,11 @@ pip install -r requirements.txt
 ```
 
 **6. Configure your token**  
-Open `.env` and paste your bot token:
+Copy `.env.example` to `.env`:
+```bash
+cp .env.example .env
+```
+Then paste your bot token:
 ```env
 TOKEN=your_actual_bot_token_here
 ```
@@ -88,7 +101,7 @@ python main.py
 
 Using `screen` (simple):
 ```bash
-screen -S linuxx
+screen -S ticket-bot
 python main.py
 # Press Ctrl+A then D to detach
 ```
@@ -96,7 +109,7 @@ python main.py
 Using `pm2` (recommended):
 ```bash
 npm install -g pm2
-pm2 start main.py --name linuxx-tickets --interpreter python3
+pm2 start main.py --name ticket-bot --interpreter python3
 pm2 save
 pm2 startup
 ```
@@ -117,7 +130,11 @@ pip install -r requirements.txt
 ```
 
 **4. Configure your token**  
-Open `.env` in Notepad and fill in your bot token:
+Copy `.env.example` to `.env`:
+```powershell
+Copy-Item .env.example .env
+```
+Then open `.env` in Notepad and fill in your bot token:
 ```env
 TOKEN=your_actual_bot_token_here
 ```
@@ -188,7 +205,7 @@ Once the bot is online:
 -> Make sure slash commands have synced. Restart the bot and wait up to 1 hour for Discord to propagate.
 
 **`TOKEN not found in .env` error?**  
--> Make sure your `.env` file exists in the root folder and contains `TOKEN=your_token_here` with no spaces around `=`.
+-> Copy `.env.example` to `.env` and set `TOKEN=your_token_here` with no spaces around `=`.
 
 **Intents error on startup?**  
 -> Enable Server Members Intent and Message Content Intent in the Discord Developer Portal.
@@ -198,4 +215,4 @@ Once the bot is online:
 
 ---
 
-*Linuxx Tickets - Developed by wmikon - Discord ID: `1313132336799420468`*
+*Ticket Bot fork customized by Ayush7hx. Original project by wmikon (Discord ID: `1313132336799420468`).*

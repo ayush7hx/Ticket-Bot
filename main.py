@@ -1,7 +1,7 @@
 """
 ╔══════════════════════════════════════════════════╗
-║          Linuxx Ticketing System                 ║
-║          Developed by wmikon                     ║
+║          Ticket Bot                              ║
+║          Fork customized by Ayush7hx             ║
 ║          discord.py 2.7+ • Python 3.10+          ║
 ╚══════════════════════════════════════════════════╝
 """
@@ -11,6 +11,7 @@ import asyncio
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
+from utils.emojis import sync_application_emojis
 
 load_dotenv()
 TOKEN = os.getenv("TOKEN")
@@ -23,14 +24,28 @@ intents.message_content = True
 intents.members = True
 
 # ── Bot ────────────────────────────────────────────────────────
-bot = commands.Bot(
+COGS = ["cogs.setup", "cogs.tickets"]
+
+
+class TicketBot(commands.Bot):
+    async def setup_hook(self):
+        if self.application_id is None:
+            raise RuntimeError("Discord did not provide an application ID; cannot sync emojis.")
+
+        created = await sync_application_emojis(self.application_id, TOKEN)
+        print(f"  Synced {created} application emoji(s)")
+
+        for cog in COGS:
+            await self.load_extension(cog)
+            print(f"  Loaded: {cog}")
+
+
+bot = TicketBot(
     command_prefix="!",
     intents=intents,
     help_command=None,
     case_insensitive=True,
 )
-
-COGS = ["cogs.setup", "cogs.tickets"]
 
 
 @bot.event
@@ -46,8 +61,9 @@ async def on_ready():
     print(f"  Bot      : {bot.user}")
     print(f"  ID       : {bot.user.id}")
     print(f"  Servers  : {len(bot.guilds)}")
-    print(f"  Dev      : wmikon")
-    print(f"  Brand    : Linuxx Ticketing")
+    print(f"  Customized: Ayush7hx")
+    print(f"  Original  : wmikon")
+    print(f"  Brand     : Ticket Bot")
     print("=" * 52)
     try:
         synced = await bot.tree.sync()
@@ -59,12 +75,6 @@ async def on_ready():
 
 async def main():
     async with bot:
-        for cog in COGS:
-            try:
-                await bot.load_extension(cog)
-                print(f"  ✅ Loaded: {cog}")
-            except Exception as e:
-                print(f"  ❌ Failed: {cog} — {e}")
         await bot.start(TOKEN)
 
 

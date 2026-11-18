@@ -2,22 +2,23 @@ from __future__ import annotations
 import discord
 from discord import app_commands
 from discord.ext import commands
+from utils.emojis import get_emoji
 from utils.store import get_config, set_config
 
 # ── Custom Emojis ──────────────────────────────────────────────
-E_SUCCESS  = "<:success:1518137986095644703>"
-E_CROSS    = "<:wickk:1518137821355966494>"
-E_INFO     = "<:Warning:1517892973482868960>"
-E_WARN     = "<:warn:1518063335923257386>"
-E_TICKET   = "<:ticket:1513730006910500977>"
-E_BUG      = "<:TbotBug:1518063885855358996>"
-E_CLAIM    = "<:claim:1518064508948447242>"
-E_VIEW     = "<:view:1518064705854373969>"
-E_REOPEN   = "<:ticket_reopen:1518064251405733898>"
-E_QUESTION = "<:question_mark:1518064034862076007>"
-E_DELETE   = "<:delete:1518064106723217418>"
-E_SETUP    = "<:setup:1518064880769568828>"
-E_CUSTOM   = "<:customize:1518065679041957989>"
+E_SUCCESS  = get_emoji("success")
+E_CROSS    = get_emoji("cross")
+E_INFO     = get_emoji("info")
+E_WARN     = get_emoji("warn")
+E_TICKET   = get_emoji("ticket")
+E_BUG      = get_emoji("bug")
+E_CLAIM    = get_emoji("claim")
+E_VIEW     = get_emoji("view")
+E_REOPEN   = get_emoji("reopen")
+E_QUESTION = get_emoji("question")
+E_DELETE   = get_emoji("delete")
+E_SETUP    = get_emoji("setup")
+E_CUSTOM   = get_emoji("customize")
 
 # ── Colors ─────────────────────────────────────────────────────
 # All container accent bars + backgrounds are pure black, regardless of
@@ -28,13 +29,9 @@ ERROR_COLOR   = 0x000000
 WARN_COLOR    = 0x000000
 INFO_COLOR    = 0x000000
 
-BRAND_FULL = "Linuxx Ticketing • Powered by wmikon"
+BRAND_FULL = "Ticket Bot • Customized by Ayush7hx"
 
-DEFAULT_BANNER = (
-    "https://cdn.discordapp.com/attachments/1414256332592254986/"
-    "1416490775046389851/standard_2.gif?ex=6a3a2795&is=6a38d615&"
-    "hm=316a7f58973c16b80a1790490a4803f968d00a1996fc83e9fb36880e2d9aa07b&"
-)
+DEFAULT_BANNER = ""
 
 DEFAULT_CATEGORIES = ["General Support", "Giveaway Claim", "Bug Report", "Other"]
 
@@ -86,7 +83,7 @@ class SetupState:
         # Pre-filled defaults — server name/icon resolved at finish time
         self.author_name: str        = ""          # filled at finish with guild.name
         self.author_icon_url: str    = ""          # filled at finish with guild.icon
-        self.footer_text: str        = "Linuxx Ticketing"
+        self.footer_text: str        = "Ticket Bot"
         self.footer_icon_url: str    = ""          # bot avatar, resolved at finish
         self.thumbnail_url: str      = ""          # guild icon, resolved at finish
         self.image_url: str          = DEFAULT_BANNER
@@ -216,8 +213,8 @@ class PanelTextModal(discord.ui.Modal, title="Panel Text Settings"):
 
 class FooterMediaModal(discord.ui.Modal, title="Footer, Thumbnail & Banner"):
     footer_text = discord.ui.TextInput(
-        label="Footer Text  (blank = 'Linuxx Ticketing')",
-        placeholder="Linuxx Ticketing",
+        label="Footer Text  (blank = 'Ticket Bot')",
+        placeholder="Ticket Bot",
         required=False,
         max_length=200,
     )
@@ -234,8 +231,8 @@ class FooterMediaModal(discord.ui.Modal, title="Footer, Thumbnail & Banner"):
         max_length=500,
     )
     image_url = discord.ui.TextInput(
-        label="Banner Image URL  (blank = default GIF)",
-        placeholder="Leave blank for the animated Linuxx banner",
+        label="Banner Image URL  (blank = no banner)",
+        placeholder="Leave blank for no banner",
         required=False,
         max_length=500,
     )
@@ -249,7 +246,7 @@ class FooterMediaModal(discord.ui.Modal, title="Footer, Thumbnail & Banner"):
         self.image_url.default       = state.image_url
 
     async def on_submit(self, interaction: discord.Interaction):
-        self.state.footer_text     = self.footer_text.value or "Linuxx Ticketing"
+        self.state.footer_text     = self.footer_text.value or "Ticket Bot"
         self.state.footer_icon_url = self.footer_icon_url.value
         self.state.thumbnail_url   = self.thumbnail_url.value
         self.state.image_url       = self.image_url.value or DEFAULT_BANNER
@@ -1097,7 +1094,7 @@ class SetupCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @app_commands.command(name="setup", description="Configure the Linuxx Ticketing button panel")
+    @app_commands.command(name="setup", description="Configure the Ticket Bot button panel")
     @app_commands.default_permissions(administrator=True)
     async def setup(self, interaction: discord.Interaction):
         existing = get_config(interaction.guild.id) or {}
@@ -1122,7 +1119,7 @@ class SetupCog(commands.Cog):
         state.panel_description = existing.get("panel_description", "Select a ticket type from the menu below.")
         state.author_name       = existing.get("author_name", "")
         state.author_icon_url   = existing.get("author_icon_url", "")
-        state.footer_text       = existing.get("footer_text", "Linuxx Ticketing")
+        state.footer_text       = existing.get("footer_text", "Ticket Bot")
         state.footer_icon_url   = existing.get("footer_icon_url", "")
         state.thumbnail_url     = existing.get("thumbnail_url", "")
         state.image_url         = existing.get("image_url", DEFAULT_BANNER)

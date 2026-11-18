@@ -1,6 +1,5 @@
 """
-Transcript generator — Linuxx Ticketing
-Dev: wmikon
+Ticket Bot transcript generator
 """
 from __future__ import annotations
 import discord
@@ -79,9 +78,9 @@ def _build_html(channel: discord.TextChannel, messages: list[discord.Message]) -
 <body>
 <header>
   <h1>Transcript — <span style="color:#5865f2">#{channel.name}</span></h1>
-  <p>Generated on {generated} &nbsp;•&nbsp; <span class="brand">Linuxx Ticketing</span> &nbsp;•&nbsp; dev: wmikon</p>
+  <p>Generated on {generated} &nbsp;•&nbsp; <span class="brand">Ticket Bot</span> &nbsp;•&nbsp; customized by Ayush7hx</p>
 </header>
 {rows}
-<footer>Linuxx Ticketing System • Developed by wmikon • {generated}</footer>
+<footer>Ticket Bot • Customized by Ayush7hx • Original project by wmikon • {generated}</footer>
 </body>
 </html>"""
